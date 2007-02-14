@@ -18,21 +18,19 @@ class Image < ActiveRecord::Base
 	# Images larger than this will be rescaled down
 	MAXSIZE = "1280x1024"
 	
-	#def self.datetime_for_id( id )
-	#	datetime = self.connection.select_one( "SELECT created_at FROM "+self.table_name+" WHERE id = "+self.connection.quote( id ) )['created_at']
-	#	datetime = ActiveRecord::ConnectionAdapters::Column.string_to_time( datetime )
-	#end
-
+	# Sanitize the filename and set the title to the filename if omitted
 	def before_save
 		self.title    = File.basename( self.filename, ".*" ) if self.title == ""
 		self.filename = friendly_file_name( self.filename )
 		check_image_data
 	end
 	
+	# Return the binary
 	def data
 		self.binary.data rescue nil
 	end
 	
+	# Set the data, create the binary if necessary
 	def data=( blob )
 		unless self.binary
 			self.binary = Binary.new
@@ -42,27 +40,29 @@ class Image < ActiveRecord::Base
 		self.binary.save
 	end
 	
+	# Returns true if the image has data
 	def data?
 		( self.binary && self.binary.data? ) ? true : false
 	end
 	
+	# Create the binary from an image file.
 	def imagefile=( image_file )
 		self.filename     = image_file.original_filename rescue File.basename( image_file.path )
-		self.content_type = image_file.content_type.chomp rescue "image/"+image_file.path.split(/\./).last.gsub(/jpg/,"jpeg") # hack hack hack
+		self.content_type = image_file.content_type.chomp rescue "image/"+image_file.path.split(/\./).last.gsub(/jpg/,"jpeg") # ugly hack
 
 		unless self.binary
 			self.binary = Binary.new
-			#self.binary.linkable = self
 		end
-
 		self.binary.data         = image_file.read
 		self.binary.save
 	end
 	
+	# Return the image hotspot
 	def hotspot
-		( Vector2d.new( self.size ) * 0.5 ).round.to_s
+		(self.hotspot?) ? self.hotspot : ( Vector2d.new( self.size ) * 0.5 ).round.to_s
 	end
 	
+	# Check the image data
 	def check_image_data
 		if self.data?
 			image     = Magick::ImageList.new.from_blob( self.data )
@@ -77,12 +77,6 @@ class Image < ActiveRecord::Base
 		end
 	end
 	
-	
-	def constrain_size( *max_size )
-		Vector2d.new( self.size ).constrain_both( max_size.flatten ).round.to_s
-	end
-	
-	
 	# Convert file name to a more file system friendly one.
 	# TODO: international chars
 	def friendly_file_name( file_name )
@@ -92,12 +86,13 @@ class Image < ActiveRecord::Base
 		File.basename( file_name ).gsub( /[^\w\d\.-]/, "_" )
 	end
 	
-	def base_part_of(file_name)
+	# Get the base part of a filename
+	def base_part_of( file_name )
 		name = File.basename(file_name)
 		name.gsub(/[ˆ\w._-]/, '')
 	end
 	
-	
+	# Rescale and crop the image, and return it as a blob.
 	def rescaled_and_cropped_data( *args )
 		data         = Magick::ImageList.new.from_blob( self.data )
 		size         = Vector2d.new( self.size )
@@ -119,7 +114,11 @@ class Image < ActiveRecord::Base
 		data.to_blob{ self.quality = 90 }
 	end
 	
+	private
 	
+	def constrain_size( *max_size )
+		Vector2d.new( self.size ).constrain_both( max_size.flatten ).round.to_s
+	end
 	
 	
 end

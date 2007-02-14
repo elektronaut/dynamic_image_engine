@@ -1,13 +1,15 @@
+# Helper methods
 module ApplicationHelper
 
-	# Returns an hash consisting of the URL to the dynamic image and parsed options.
+	# Returns an hash consisting of the URL to the dynamic image and parsed options. This is mostly for internal use by 
+	# dynamic_image_tag and dynamic_image_url.
 	def dynamic_image_options( image, options = {} )
+
 		# TODO: use url_for to get the proper image url from routing
 		options.symbolize_keys!
 		options[:crop] = false unless options[:crop] == true
 		
 		url = "/dynamic_image/"
-		#url = ""
 
 		url << image.id.to_s << "/"
 

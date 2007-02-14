@@ -1,7 +1,27 @@
-DynamicImage
-============
+DynamicImage is a vertical drop-in solution for database based images, 
+providing models, helper methods and a controller for retrieving images.
 
-Requirements:
-* Rails 1.2.2
-* Engines 1.2.0
+Thumbnails are generated on demand and stored in the cached_images.
 
+== Requirements:
+
+* Engines 1.2.0 (plugin)
+* Rails 1.2.x
+* RMagick (gem)
+* Vector2d (gem)
+
+== Installation:
+
+Make sure you have all the requirements installed, then put the 
+dynamic_image folder in vendor/plugins. 
+
+DynamicImage uses three tables, <tt>images</tt>, <tt>cached_images</tt> 
+and <tt>binaries</tt>. Please make sure these don't clash with your current
+database schema. 
+
+== Usage:
+
+Use the <tt>dynamic_image_tag</tt> helper in your views to make urls from 
+images, which wraps the <tt>dynamic_tag</tt> helper:
+
+  <%= dynamic_image_tag @image, :size => '150x100' %>

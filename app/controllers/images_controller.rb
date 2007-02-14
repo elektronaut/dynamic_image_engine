@@ -1,7 +1,5 @@
+# Controller for the DynamicImage engine
 class ImagesController < ApplicationController
-
-	#acts_as_dynamic_image_controller
-	#caches_action :view_image
 
 	# Return the requested image. Rescale, filter and cache it where appropriate.
 	def view_image

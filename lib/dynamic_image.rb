@@ -9,15 +9,15 @@ module DynamicImage
 		def names; keys; end
 	end
 	
-	# Accessor for the filtersets hash. Installed filter names are available through the <tt>names</tt> singleton method. Example:
+	# Accessor for the filtersets hash. Installed filter names are available through the <tt>names</tt> method. Example:
 	#   @filter_names = DynamicImage.filtersets.names
 	def self.filtersets
 		@@filtersets
 	end
 	
 	# Base class for filter sets. Extending this with your own subclasses will automatically enable them for use.
-	# You'll need to overwrite <tt>Filterset.process</tt> in order to make your filter useful. You could simply drop
-	# these examples in at the bottom of your environment.rb file.
+	# You'll need to overwrite <tt>Filterset.process</tt> in order to make your filter useful. Note that it's a class
+	# method.
 	#
 	# === Example
 	#
@@ -44,9 +44,9 @@ module DynamicImage
 	#
 	# === Chaining filters
 	#
-	#   You can only apply one filterset on an image, but compound filters can easily be created:
+	# You can only apply one filterset on an image, but compound filters can easily be created:
 	#
-	#   class FunkyFilterset < DynamicImage::Filterset
+	#   class CompoundFilterset < DynamicImage::Filterset
 	#     def self.process( image )
 	#       image = MyFirstFilterset.process( image )
 	#       image = SomeOtherFilterset.process( image )
@@ -57,20 +57,20 @@ module DynamicImage
 	class Filterset
 		include Magick
 
-		# Detect inheritance, do the magic.
+		# Detect inheritance and store the new filterset in the lookup table.
 		def self.inherited( sub )
 			filter_name = sub.name.gsub!( /Filterset$/, '' ).underscore
 			DynamicImage.filtersets[filter_name] = sub
 		end
 
-		# Get a filter set by name (accepts a symbol or string, CamelCase and under_scores both work)
+		# Get a Filterset class by name. Accepts a symbol or string, CamelCase and under_scores both work.
 		def self.[]( filter_name )
 			filter_name = filter_name.to_s if filter_name.kind_of? Symbol
 			filter_name = filter_name.underscore
 			DynamicImage.filtersets[filter_name] || nil
 		end
 
-		# Dummy method, overwrite this in subclasses to actually do something. 
+		# Process the image. This is a dummy method, you should overwrite it in your subclass.
 		def self.process( image )
 			# This is a stub
 		end

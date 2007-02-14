@@ -1,0 +1,3 @@
+* Cleanup the ugly self.data hack in Image
+* Use url_for in the dynamic_image_options helper
+* Finish README

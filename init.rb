@@ -1,6 +1,6 @@
 # Load prerequisites
 require 'RMagick'
-require 'Vector2d'
+require 'vector2d'
 
 # Include hook code here
 require 'dynamic_image'

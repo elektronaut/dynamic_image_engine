@@ -1,8 +1,8 @@
 require 'test/unit'
 
 class DynamicImageTest < Test::Unit::TestCase
-  # Replace this with your real tests.
-  def test_this_plugin
-    flunk
-  end
+	# Replace this with your real tests.
+	def test_this_plugin
+		#flunk
+	end
 end

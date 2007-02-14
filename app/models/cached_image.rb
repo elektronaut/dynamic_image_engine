@@ -1,17 +1,11 @@
-
-
 # Resized and filtered images are stored in the cached_images table.
 class CachedImage < ActiveRecord::Base
 	belongs_to :image
 	
-	
-	
-	# Purge all cached data (with optional conditions).
+	# Purge all cached data (with optional conditions). Note: this method is superfluous and depreceated.
 	def self.clear_cache( conditions = nil )
 		CachedImage.delete_all( conditions )
 	end
-
-
 
 	# Get or generate a CachedImage object. image and filterset should be objects, size can be
 	# any Vector2d compatible type (ie, String, Numeric or Array).
@@ -32,17 +26,12 @@ class CachedImage < ActiveRecord::Base
 		end
 		cached_image
 	end
-	
-
 
 	# Apply filters to the image data. If no filter set is specified, this method will look
 	# for a set called "default" and apply it.
 	def apply_filters
-	
 		filterset_name = self.filterset || 'default'
-		
-		filterset = ActsAsDynamicImage::Filterset[filterset_name]
-		
+		filterset = DynamicImage::Filterset[filterset_name]
 		if filterset
 			data = Magick::ImageList.new.from_blob( self.data )
 			data = filterset.process( data )
