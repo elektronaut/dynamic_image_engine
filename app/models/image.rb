@@ -14,9 +14,9 @@ class Image < ActiveRecord::Base
 	# Images larger than this will be rescaled down
 	MAXSIZE = "1280x1024"
 	
-	# Sanitize the filename and set the title to the filename if omitted
+	# Sanitize the filename and set the name to the filename if omitted
 	def before_save
-		self.title    = File.basename( self.filename, ".*" ) if self.title == ""
+		self.name    = File.basename( self.filename, ".*" ) if self.name == ""
 		self.filename = friendly_file_name( self.filename )
 		check_image_data
 	end
