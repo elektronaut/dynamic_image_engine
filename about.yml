@@ -1,0 +1,7 @@
+author: Inge Jørgensen
+email: inge@manualdesign.no
+homepage: http://dev.manualdesign.no/plugins/dynamic_image/
+summary: A vertical drop-in solution for database based images.
+description: DynamicImage is a vertical drop-in solution for database based images, providing models, helper methods and a controller for retrieving images. Thumbnails are created on demand and cached.
+license: MIT
+version: 0.5.0

@@ -1,7 +1,8 @@
 DynamicImage is a vertical drop-in solution for database based images, 
 providing models, helper methods and a controller for retrieving images.
 
-Thumbnails are generated on demand and stored in the cached_images.
+Thumbnails are generated on demand and stored in the cached_images table.
+
 
 == Requirements:
 
@@ -10,18 +11,113 @@ Thumbnails are generated on demand and stored in the cached_images.
 * RMagick (gem)
 * Vector2d (gem)
 
+
 == Installation:
 
-Make sure you have all the requirements installed, then put the 
-dynamic_image folder in vendor/plugins. 
+=== 1. Install dependencies
+
+Make sure you've got the Engines plugin installed. Head on over to 
+http://rails-engines.org to read more about engines, but this should
+generally be as easy as running <tt>script/plugin install engines</tt>.
+
+Please note: DynamicImage requires version 1.2.0 or greater, which depends
+on Rails 1.2.
+
+Make sure you've got the RMagick and Vector2d gems installed. 
+This is typically done by issuing these two commands:
+
+  sudo gem install rmagick
+  sudo gem install vector2d
+
+=== 2. Install the plugin
+
+This couldn't be easier, just drop the dynamic_image folder into vendor/plugins.
+
+=== 3. Migrate your database
 
 DynamicImage uses three tables, <tt>images</tt>, <tt>cached_images</tt> 
 and <tt>binaries</tt>. Please make sure these don't clash with your current
-database schema. 
+database schema, if they do, you need to do your own migrations. 
+
+In general, you should be cautious about applying migrations you don't know
+about. Please have a look in the db/migrate directory and verify that this
+step won't wreak havoc on your database.
+
+If there's no conflicts, simply issue this command in the base dir of
+your app to create the migration:
+
+  ruby script/generate plugin_migration dynamic_image
+
+Which should return something like this:
+
+  exists  db/migrate
+  create  db/migrate/012_dynamic_image_to_version_3.rb
+
+Now, apply your migration with:
+
+  rake db:migrate
+
+=== 4. Hook up the routes
+
+Put these two lines somewhere in your config/routes.rb file:
+
+  # Images
+  map.from_plugin :dynamic_image
+
+
 
 == Usage:
 
-Use the <tt>dynamic_image_tag</tt> helper in your views to make urls from 
-images, which wraps the <tt>dynamic_tag</tt> helper:
+=== Uploading an image
+
+Creating a new image from an uploaded file is simple, here's some 
+example view code:
+
+  <% form_for 'image', Image.new, :html => { :multipart => true } do |f| %>
+    Name: <%= f.text_filed :name %>
+    File: <%= f.file_field :imagefile %>
+    <%= submit_tag "Upload" %>
+  <% end %>
+
+And for the controller:
+
+  @image = Image.create( params[:image] )
+
+=== Displaying an image
+
+Use the <tt>dynamic_image_tag</tt> helper in your views to display an image,
+for example:
 
   <%= dynamic_image_tag @image, :size => '150x100' %>
+
+See <tt>ApplicationHelper.dynamic_image_tag</tt> for more info.
+
+=== Associations
+
+Using the <tt>belongs_to_image</tt> macro enables you to set an image directly 
+from an uploaded file. Refer to 
+<tt>ActiveRecord::Associations::ClassMethods</tt> for documentation.
+
+=== Filtersets
+
+Filtersets provide an easy way to process your thumbnails through ImageMagick. 
+You can create multiple filtersets, and use them in a 
+<tt>dynamic_image_tag</tt> with the <tt>:filterset</tt> option. They are 
+documented in <tt>DynamicImage::Filterset</tt>.
+
+
+== A word of warning:
+
+Having images stored in the database does create a performance hit. 
+DynamicImage stores the results in the cached_images table, but you should 
+also enable page caching for the controller to offload the heavy lifting
+to the web server. This has not been enabled in the plugin for compatibility
+reasons, but you could easily do it yourself:
+
+Create a new file in <tt>app/controllers</tt> called
+<tt>images_controller.rb</tt>, and enter the following few lines:
+
+  class ImagesController < ApplicationController
+    caches_page :view_image
+  end
+

@@ -26,11 +26,10 @@ class Image < ActiveRecord::Base
 		self.binary.data rescue nil
 	end
 	
-	# Set the data, create the binary if necessary
+	# Set the image data, create the binary if necessary
 	def data=( blob )
 		unless self.binary
 			self.binary = Binary.new
-			self.binary.linkable = self
 		end
 		self.binary.data = blob
 		self.binary.save
@@ -92,12 +91,12 @@ class Image < ActiveRecord::Base
 	def rescaled_and_cropped_data( *args )
 		data         = Magick::ImageList.new.from_blob( self.data )
 		size         = Vector2d.new( self.size )
-		rescale_size = size.dup.constrain_one( args ).round                             # rescale dimensions
-		crop_size    = Vector2d::new( args )                                            # crop size
-		new_hotspot  = Vector2d::new( hotspot ) * ( rescale_size / size )               # recalculated hotspot
-		rect = [ (new_hotspot-(crop_size/2)).round, (new_hotspot+(crop_size/2)).round ] # array containing crop coords
+		rescale_size = size.dup.constrain_one( args ).round                             # Rescale dimensions
+		crop_size    = Vector2d::new( args )                                            # Crop size
+		new_hotspot  = Vector2d::new( hotspot ) * ( rescale_size / size )               # Recalculated hotspot
+		rect = [ (new_hotspot-(crop_size/2)).round, (new_hotspot+(crop_size/2)).round ] # Array containing crop coords
 			  
-		#adjustments
+		# Adjustments
 		x = rect[0].x; rect.each { |r| r.x += (x.abs) }            if ( x < 0 ) 
 		y = rect[0].y; rect.each { |r| r.y += (y.abs) }            if ( y < 0 ) 
 		x = rect[1].x; rect.each { |r| r.x -= (x-rescale_size.x) } if ( x > rescale_size.x ) 
@@ -109,8 +108,6 @@ class Image < ActiveRecord::Base
 		data = data.resize( rescale_size.x, rescale_size.y ).crop( rect[0].x, rect[0].y, crop_size.x, crop_size.y )
 		data.to_blob{ self.quality = 90 }
 	end
-	
-	private
 	
 	def constrain_size( *max_size )
 		Vector2d.new( self.size ).constrain_both( max_size.flatten ).round.to_s

@@ -1,6 +1,6 @@
 # Controller for the DynamicImage engine
 class ImagesController < ApplicationController
-
+	
 	# Return the requested image. Rescale, filter and cache it where appropriate.
 	def view_image
 		minTime = Time.rfc2822( request.env[ "HTTP_IF_MODIFIED_SINCE" ] ) rescue nil
