@@ -33,7 +33,9 @@ module ActiveRecord
 					def #{association_id}=( image )
 						# Convert a Tempfile to a proper Image
 						begin
-							if image.kind_of?( Tempfile ) || image.kind_of?( StringIO )
+							if image.kind_of?( StringIO )
+								image = Image.create( :imagefile => image )
+							elsif image.kind_of?( Tempfile )
 								image = Image.create( :imagefile => image )
 							end
 						rescue
