@@ -32,8 +32,11 @@ module ActiveRecord
 					alias_method :associated_#{association_id}=, :#{association_id}=
 					def #{association_id}=( image )
 						# Convert a Tempfile to a proper Image
-						if image.kind_of?( Tempfile )
-							image = Image.create( :imagefile => image )
+						begin
+							if image.kind_of?( Tempfile )
+								image = Image.create( :imagefile => image )
+							end
+						rescue
 						end
 						# Quietly skip blank strings
 						unless image.kind_of?( String ) && image.blank?
