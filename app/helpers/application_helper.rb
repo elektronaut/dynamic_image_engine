@@ -9,7 +9,7 @@ module ApplicationHelper
 		options.symbolize_keys!
 
 		options     = { :crop => false }.merge( options )
-		url_options = { :controller => :images, :action => :view_image, :id => image }
+		url_options = { :controller => "/images", :action => :view_image, :id => image }
 		
 		# Image sizing
 		if options[:size]
