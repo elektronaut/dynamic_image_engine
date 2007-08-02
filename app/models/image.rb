@@ -15,10 +15,10 @@ class Image < ActiveRecord::Base
 	MAXSIZE = "1280x1024"
 	
 	# Sanitize the filename and set the name to the filename if omitted
-	def before_save
-		self.name    = File.basename( self.filename, ".*" ) if self.name == ""
-		self.filename = friendly_file_name( self.filename )
-		check_image_data
+	validate do |image|
+		image.name    = File.basename( image.filename, ".*" ) if !image.name || image.name.strip == ""
+		image.filename = image.friendly_file_name( image.filename )
+		image.check_image_data
 	end
 	
 	# Return the binary

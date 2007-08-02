@@ -25,6 +25,7 @@ module ActiveRecord
 			#
 			def belongs_to_image( association_id, options={} )
 				options[:class_name] ||= 'Image'
+				options[:foreign_key] ||= options[:class_name].downcase+'_id'
 				belongs_to association_id, options
 
 				# Overwrite the setter method
