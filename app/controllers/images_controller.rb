@@ -7,15 +7,17 @@ class ImagesController < ApplicationController
 
 		image = Image.find( params[:id] ) rescue nil
 		unless image
-			render :status => 404, :text => "404: Image not found" and return
+			if self.respond_to?( :render_error )
+				render_error 404 and return
+			else
+				render :status => 404, :text => "404: Image not found" and return
+			end
 		end
 
 		if minTime && image.created_at? && image.created_at <= minTime
 			render_text '', '304 Not Modified'
 			return
 		end
-
-		image = Image.find( params[:id] )
 
 		imagedata = ( params[:size] ) ? CachedImage.get_cached( image, params[:size], params[:filterset] ) : image
 
