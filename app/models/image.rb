@@ -43,7 +43,7 @@ class Image < ActiveRecord::Base
 	# Create the binary from an image file.
 	def imagefile=( image_file )
 		self.filename     = image_file.original_filename rescue File.basename( image_file.path )
-		self.content_type = image_file.content_type.chomp rescue "image/"+image_file.path.split(/\./).last.gsub(/jpg/,"jpeg") # ugly hack
+		self.content_type = image_file.content_type.chomp rescue "image/"+image_file.path.split(/\./).last.downcase.gsub(/jpg/,"jpeg") # ugly hack
 
 		unless self.binary
 			self.binary = Binary.new
