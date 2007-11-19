@@ -36,6 +36,10 @@ module ApplicationHelper
 		options[:alt] ||= image.name if image.name?
 		options[:alt] ||= image.filename.split('.').first.capitalize
 		
+		if options.has_key? :only_path
+			url_options[:only_path] = options[:only_path]
+		end
+		
 		{ :url => url_for( url_options ), :options => options }
 	end
 	
