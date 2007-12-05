@@ -38,6 +38,7 @@ module ApplicationHelper
 		
 		if options.has_key? :only_path
 			url_options[:only_path] = options[:only_path]
+			options[:only_path] = nil
 		end
 		
 		{ :url => url_for( url_options ), :options => options }
