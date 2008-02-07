@@ -13,7 +13,11 @@ module ApplicationHelper
 		
 		# Image sizing
 		if options[:size]
-			options[:size] = Vector2d.new( image.size ).constrain_both( options[:size] ).round.to_s unless ( options[:crop] )
+			unless options[:crop]
+				options[:size] = Vector2d.new( options[:size] ).constrain_one( image.size )     # Don't upscale
+				options[:size] = Vector2d.new( image.size ).constrain_both( options[:size] )
+				options[:size] = options[:size].round.to_s
+			end
 			url_options[:size] = options[:size]
 		end
 		options.delete :crop
