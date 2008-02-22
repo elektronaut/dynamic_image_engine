@@ -63,11 +63,11 @@ class Image < ActiveRecord::Base
 			image     = Magick::ImageList.new.from_blob( self.data )
 			size      = Vector2d.new( image.columns, image.rows )
 			maxsize   = Vector2d.new( MAXSIZE )
-			if ( size.x > maxsize.x || size.y > maxsize.y )
-				size = size.constrain_both( maxsize ).round
-				image.resize!( size.x, size.y )
-				self.data = image.to_blob
-			end
+			#if ( size.x > maxsize.x || size.y > maxsize.y )
+			#	size = size.constrain_both( maxsize ).round
+			#	image.resize!( size.x, size.y )
+			#	self.data = image.to_blob
+			#end
 			self.size = size.round.to_s
 		end
 	end
