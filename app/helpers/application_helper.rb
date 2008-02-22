@@ -38,7 +38,15 @@ module ApplicationHelper
 		end
 
 		# Filename
-		url_options[:filename] = image.filename
+		if options[:filename]
+			filename = options[:filename]
+			unless filename =~ /\.[\w]{1,4}$/
+				filename += "." + image.filename.split(".").last
+			end
+			url_options[:filename] = filename
+		else
+			url_options[:filename] = image.filename
+		end
 
 		# Alt attribute
 		options[:alt] ||= image.name if image.name?
