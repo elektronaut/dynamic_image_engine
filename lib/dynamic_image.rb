@@ -31,19 +31,15 @@ module ActiveRecord
 				# Overwrite the setter method
 				class_eval <<-end_eval
 					alias_method :associated_#{association_id}=, :#{association_id}=
-					def #{association_id}=( image )
+					def #{association_id}=( img_obj )
 						# Convert a Tempfile to a proper Image
-						begin
-							if image.kind_of?( StringIO )
-								image = Image.create( :imagefile => image )
-							elsif image.kind_of?( Tempfile )
-								image = Image.create( :imagefile => image )
-							end
-						rescue
+						case img_obj
+						when StringIO, Tempfile, ActionController::UploadedTempfile, File
+							img_obj = Image.create( :imagefile => img_obj )
 						end
 						# Quietly skip blank strings
-						unless image.kind_of?( String ) && image.blank?
-							self.associated_#{association_id} = image
+						unless img_obj.kind_of?( String ) && img_obj.blank?
+							self.associated_#{association_id} = img_obj
 						end
 					end
 				end_eval

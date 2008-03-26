@@ -15,7 +15,7 @@ class ImagesController < ApplicationController
 		end
 
 		if minTime && image.created_at? && image.created_at <= minTime
-			render_text '', '304 Not Modified'
+			render :text => '304 Not Modified', :status => 304
 			return
 		end
 
