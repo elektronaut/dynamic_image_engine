@@ -6,10 +6,14 @@ require 'vector2d'
 require 'dynamic_image'
 
 # Evil, evil hack to support reloading of models
-Rails::Plugin.class_eval do
-	def reloadable!
-		load_paths.each { |p| Dependencies.load_once_paths.delete(p) }
+begin
+	# Rails 2.0
+	Rails::Plugin.class_eval do
+		def reloadable!
+			load_paths.each { |p| Dependencies.load_once_paths.delete(p) }
+		end
 	end
+	reloadable!
+rescue
+	# Rails 1.x
 end
-
-reloadable!
