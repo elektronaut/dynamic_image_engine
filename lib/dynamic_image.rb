@@ -43,7 +43,7 @@ module ActiveRecord
 						end
 						# Convert a Tempfile to a proper Image
 						case img_obj
-						when StringIO, ActionController::UploadedTempfile, File
+						when StringIO, File
 							img_obj = Image.create( :imagefile => img_obj )
 						end
 						# Quietly skip blank strings
