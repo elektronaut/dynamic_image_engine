@@ -32,9 +32,18 @@ module ActiveRecord
 				class_eval <<-end_eval
 					alias_method :associated_#{association_id}=, :#{association_id}=
 					def #{association_id}=( img_obj )
+						# Hack
+						begin
+							case img_obj
+							when StringIO, Tempfile, ActionController::UploadedTempfile, File
+								img_obj = Image.create( :imagefile => img_obj )
+							end
+						rescue
+							# Do nothing
+						end
 						# Convert a Tempfile to a proper Image
 						case img_obj
-						when StringIO, Tempfile, ActionController::UploadedTempfile, File
+						when StringIO, ActionController::UploadedTempfile, File
 							img_obj = Image.create( :imagefile => img_obj )
 						end
 						# Quietly skip blank strings
