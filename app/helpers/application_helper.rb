@@ -26,7 +26,7 @@ module ApplicationHelper
 		end
 		options.delete :crop
 
-		if options[:no_size_tags]
+		if options[:no_size_attr]
 			options.delete :no_size_attr
 			options.delete :size
 		end
