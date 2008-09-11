@@ -9,9 +9,13 @@ require 'dynamic_image'
 begin
 	# Rails 2.0
 	Rails::Plugin.class_eval do
-		def reloadable!
-			load_paths.each { |p| Dependencies.load_once_paths.delete(p) }
-		end
+    	def reloadable!
+    	    if ActiveSupport.const_defined?("Dependencies")
+        		load_paths.each { |p| ActiveSupport::Dependencies.load_once_paths.delete(p) }
+            else
+        		load_paths.each { |p| Dependencies.load_once_paths.delete(p) }
+            end
+    	end
 	end
 	reloadable!
 rescue
