@@ -23,8 +23,6 @@ class ImagesController < ApplicationController
 		    if size =~ /^x[\d]+$/ || size =~ /^[\d]+x$/
 		        size = Vector2d.new(size)
 			    image_size = Vector2d.new( image.size )
-			    size.x = image_size.x if size.x > 0 && size.x > image_size.x
-			    size.y = image_size.y if size.y > 0 && size.y > image_size.y
 			    size = image_size.constrain_both(size).round.to_s
 			end
     		imagedata = CachedImage.get_cached(image, size, params[:filterset])

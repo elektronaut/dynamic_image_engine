@@ -15,12 +15,16 @@ module ApplicationHelper
 		if options[:size]
 			new_size   = Vector2d.new( options[:size] )
 			image_size = Vector2d.new( image.size )
-			new_size.x = image_size.x if new_size.x > 0 && new_size.x > image_size.x
-			new_size.y = image_size.y if new_size.y > 0 && new_size.y > image_size.y
+
+            unless options[:upscale]
+			    new_size.x = image_size.x if new_size.x > 0 && new_size.x > image_size.x
+			    new_size.y = image_size.y if new_size.y > 0 && new_size.y > image_size.y
+		    end
 
 			unless options[:crop]
 				new_size = image_size.constrain_both( new_size )
 			end
+
 			options[:size] = new_size.round.to_s
 			url_options[:size] = options[:size]
 		end
