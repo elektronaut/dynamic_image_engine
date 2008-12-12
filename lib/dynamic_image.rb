@@ -1,5 +1,36 @@
 require 'dynamic_image/filterset'
 
+module DynamicImage
+	@@dirty_memory = false
+	
+	class << self
+		
+		def dirty_memory=(flag)
+			@@dirty_memory = flag
+		end
+		
+		def dirty_memory
+			@@dirty_memory
+		end
+		
+		# RMagick stores image data internally, Ruby doesn't see the used memory.
+		# This method performs garbage collection if @@dirty_memory has been flagged.
+		# More details here: http://rubyforge.org/forum/message.php?msg_id=1995
+		def clean_dirty_memory(options={})
+			options.symbolize_keys!
+			if @@dirty_memory || options[:force]
+				gc_disabled = GC.enable
+				GC.start
+				GC.disable if gc_disabled
+				@@dirty_memory = false
+				true
+			else
+				false
+			end
+		end
+	end
+end
+
 module ActiveRecord
 	module Associations
 		
@@ -36,6 +67,7 @@ module ActiveRecord
 						begin
 							case img_obj
 							when StringIO, Tempfile, ActionController::UploadedTempfile, File
+								DynamicImage.dirty_memory = true # Flag for GC
 								img_obj = Image.create( :imagefile => img_obj )
 							end
 						rescue
@@ -44,6 +76,7 @@ module ActiveRecord
 						# Convert a Tempfile to a proper Image
 						case img_obj
 						when StringIO, File
+							DynamicImage.dirty_memory = true # Flag for GC
 							img_obj = Image.create( :imagefile => img_obj )
 						end
 						# Quietly skip blank strings

@@ -33,7 +33,7 @@ module DynamicImage
 	#
 	# === Applying effects by default
 	#
-	# If <tt>CachedImage.get_cached</tt> is called without filters, it will look for a set named 'default'.
+	# If <tt>Image.get_oricessed</tt> is called without filters, it will look for a set named 'default'.
 	# This means that you can automatically apply effects on resized images by defining a class called <tt>DefaultFilterset</tt>:
 	#
 	#   class DefaultFilterset < DynamicImage::Filterset

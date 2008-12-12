@@ -13,12 +13,18 @@ class Image < ActiveRecord::Base
 
 	# Images larger than this will be rescaled down
 	MAXSIZE = "1280x1024"
+
+	attr_accessor :filterset, :binary_set
 	
 	# Sanitize the filename and set the name to the filename if omitted
 	validate do |image|
 		image.name    = File.basename( image.filename, ".*" ) if !image.name || image.name.strip == ""
 		image.filename = image.friendly_file_name( image.filename )
+	end
+	
+	before_save do |image|
 		image.check_image_data
+		self.binary.save if @binary_set
 	end
 	
 	# Return the binary
@@ -32,7 +38,7 @@ class Image < ActiveRecord::Base
 			self.binary = Binary.new
 		end
 		self.binary.data = blob
-		self.binary.save
+		@binary_set = true
 	end
 	
 	# Returns true if the image has data
@@ -89,6 +95,7 @@ class Image < ActiveRecord::Base
 	
 	# Rescale and crop the image, and return it as a blob.
 	def rescaled_and_cropped_data( *args )
+		DynamicImage.dirty_memory = true                                                # Flag to perform GC
 		data         = Magick::ImageList.new.from_blob( self.data )
 		size         = Vector2d.new( self.size )
 		rescale_size = size.dup.constrain_one( args ).round                             # Rescale dimensions
@@ -113,5 +120,27 @@ class Image < ActiveRecord::Base
 		Vector2d.new( self.size ).constrain_both( max_size.flatten ).round.to_s
 	end
 	
+	# Get a duplicate image with resizing and filters applied.
+	def get_processed(size, filterset=nil)
+		size       = Vector2d.new( size ).round.to_s
+		processed_image = Image.new
+		processed_image.filterset = filterset || 'default'
+		processed_image.data = self.rescaled_and_cropped_data(size)
+		processed_image.size = size
+		processed_image.apply_filters
+		processed_image
+	end
+	
+	# Apply filters to image data
+	def apply_filters
+		filterset_name = self.filterset || 'default'
+		filterset = DynamicImage::Filterset[filterset_name]
+		if filterset
+			DynamicImage.dirty_memory = true # Flag for GC
+			data = Magick::ImageList.new.from_blob( self.data )
+			data = filterset.process( data )
+			self.data = data.to_blob
+		end
+	end
 	
 end

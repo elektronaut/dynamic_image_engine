@@ -25,11 +25,12 @@ class ImagesController < ApplicationController
 			    image_size = Vector2d.new( image.size )
 			    size = image_size.constrain_both(size).round.to_s
 			end
-    		imagedata = CachedImage.get_cached(image, size, params[:filterset])
+    		imagedata = image.get_processed(size, params[:filterset])
 	    else
     		imagedata = image
         end
 
+		DynamicImage.dirty_memory = true # Flag memory for GC
 
 		if image
 			response.headers['Cache-Control'] = nil
@@ -43,5 +44,21 @@ class ImagesController < ApplicationController
 		end
 		
 	end
+	
+	# Enforce caching of dynamic images, even if caching is turned off
+	def cache_dynamic_image
+		cache_setting = ActionController::Base.perform_caching
+		ActionController::Base.perform_caching = true
+		cache_page
+		ActionController::Base.perform_caching = cache_setting
+	end
+	after_filter :cache_dynamic_image
+	
+	# Perform garbage collection if necessary
+	def run_garbage_collection_for_dynamic_image_controller
+		DynamicImage.clean_dirty_memory
+	end
+	protected    :run_garbage_collection_for_dynamic_image_controller
+	after_filter :run_garbage_collection_for_dynamic_image_controller
 
 end
