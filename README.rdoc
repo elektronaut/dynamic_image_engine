@@ -1,3 +1,5 @@
+= DynamicImage
+
 DynamicImage is a rails engine providing transparent uploading, resizing 
 and processing on the fly, and caching of image files.
 
