@@ -46,7 +46,7 @@ Creating a new image from an uploaded file is simple, here's some
 example view code:
 
   <% form_for 'image', Image.new, :html => {:multipart => true} do |f| %>
-    Name: <%= f.text_filed :name %>
+    Name: <%= f.text_field :name %>
     File: <%= f.file_field :imagefile %>
     <%= submit_tag "Upload" %>
   <% end %>
