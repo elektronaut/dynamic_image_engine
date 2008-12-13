@@ -1,5 +1,3 @@
-require "RMagick"
-
 module DynamicImage
 
 	@@filtersets = Hash.new

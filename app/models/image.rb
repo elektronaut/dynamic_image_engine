@@ -1,18 +1,15 @@
-require 'vector2d'
-
 class Image < ActiveRecord::Base
 
 	belongs_to :binary
 			
-	has_many   :cached_images, :dependent => :delete_all
-
 	validates_format_of :content_type, 
 	                    :with => /^image/,
 		                :message => "you can only upload pictures"
 	
 
-	# Images larger than this will be rescaled down
-	MAXSIZE = "1280x1024"
+	# Images larger than MAXSIZE will be rescaled down
+	MAXSIZE_ENABLED = false
+	MAXSIZE         = "1280x1024"
 
 	attr_accessor :filterset, :binary_set
 	
@@ -68,23 +65,24 @@ class Image < ActiveRecord::Base
 		if self.data?
 			image     = Magick::ImageList.new.from_blob( self.data )
 			size      = Vector2d.new( image.columns, image.rows )
+			if MAXSIZE_ENABLED
 			maxsize   = Vector2d.new( MAXSIZE )
-			#if ( size.x > maxsize.x || size.y > maxsize.y )
-			#	size = size.constrain_both( maxsize ).round
-			#	image.resize!( size.x, size.y )
-			#	self.data = image.to_blob
-			#end
+				if ( size.x > maxsize.x || size.y > maxsize.y )
+					size = size.constrain_both( maxsize ).round
+					image.resize!( size.x, size.y )
+					self.data = image.to_blob
+				end
+			end
 			self.size = size.round.to_s
 		end
 	end
 	
 	# Convert file name to a more file system friendly one.
-	# TODO: international chars
 	def friendly_file_name( file_name )
 		[ ["æ","ae"], ["ø","oe"], ["å","aa"] ].each do |int|
-			file_name = file_name.gsub( int[0], int[1] )
+			file_name = file_name.gsub(int[0], int[1])
 		end
-		File.basename( file_name ).gsub( /[^\w\d\.-]/, "_" )
+		File.basename( file_name ).gsub(/[^\w\d\.-]/, "_")
 	end
 	
 	# Get the base part of a filename

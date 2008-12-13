@@ -1,5 +1,3 @@
-require 'vector2d'
-
 # Helper methods for DynamicImage
 module ApplicationHelper
 

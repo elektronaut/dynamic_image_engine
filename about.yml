@@ -4,4 +4,4 @@ homepage: http://dev.manualdesign.no/plugins/dynamic_image/
 summary: A vertical drop-in solution for database based images.
 description: DynamicImage is a rails engine providing transparent uploading, resizing and processing on the fly, and caching of image files.
 license: MIT
-version: 0.9.0
+version: 0.9.8

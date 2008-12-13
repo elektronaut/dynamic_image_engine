@@ -2,6 +2,7 @@ require 'dynamic_image/filterset'
 
 module DynamicImage
 	@@dirty_memory = false
+	@@page_caching = true
 	
 	class << self
 		
@@ -13,6 +14,14 @@ module DynamicImage
 			@@dirty_memory
 		end
 		
+		def page_caching=(flag)
+			@@page_caching = flag
+		end
+		
+		def page_caching
+			@@page_caching
+		end
+
 		# RMagick stores image data internally, Ruby doesn't see the used memory.
 		# This method performs garbage collection if @@dirty_memory has been flagged.
 		# More details here: http://rubyforge.org/forum/message.php?msg_id=1995

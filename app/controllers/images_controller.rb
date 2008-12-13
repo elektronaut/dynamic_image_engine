@@ -55,16 +55,18 @@ class ImagesController < ApplicationController
 		
 	end
 	
-	# Enforce caching of dynamic images, even if caching is turned off
+	# Enforces caching of dynamic images, even if caching is turned off
 	def cache_dynamic_image
-		cache_setting = ActionController::Base.perform_caching
-		ActionController::Base.perform_caching = true
-		cache_page
-		ActionController::Base.perform_caching = cache_setting
+		if DynamicImage.page_caching
+			cache_setting = ActionController::Base.perform_caching
+			ActionController::Base.perform_caching = true
+			cache_page
+			ActionController::Base.perform_caching = cache_setting
+		end
 	end
 	after_filter :cache_dynamic_image
 	
-	# Perform garbage collection if necessary
+	# Performs garbage collection if necessary
 	def run_garbage_collection_for_dynamic_image_controller
 		DynamicImage.clean_dirty_memory
 	end
