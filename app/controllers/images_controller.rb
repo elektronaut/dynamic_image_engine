@@ -1,10 +1,9 @@
-# Controller for the DynamicImage engine
 class ImagesController < ApplicationController
 	
 	session :off
 
 	def render_missing_image
-		if self.respond_to?( :render_error )
+		if self.respond_to?(:render_error)
 			render_error 404
 		else
 			render :status => 404, :text => "404: Image not found"
