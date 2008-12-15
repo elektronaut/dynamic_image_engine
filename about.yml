@@ -4,4 +4,4 @@ homepage: http://github.com/elektronaut/dynamic_image/
 summary: Rails engine for handling image uploading and resizing
 description: DynamicImage is a rails engine providing transparent uploading, resizing and processing on the fly, and caching of image files.
 license: MIT
-version: 0.9.8
+version: 1.0.0
