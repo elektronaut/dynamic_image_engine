@@ -4,37 +4,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
 	<title>elektronaut/dynamic_image @ GitHub</title>
-	
-	<style type="text/css">
-		body {
-  		margin-top: 1.0em;
-  		background-color: #38bef5;
-		  font-family: "helvetica"; 
-  		color: #000000;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-		h1 { font-size: 3.8em; color: #c7410a; margin-bottom: 3px; }
-		h1 .small { font-size: 0.4em; }
-		h1 a { text-decoration: none }
-		h2 { font-size: 1.5em; color: #c7410a; }
-    h3 { text-align: center; color: #c7410a; }
-    a { color: #c7410a; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-		pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-	</style>
-	
+	<link rel="stylesheet" href="http://elektronaut.github.com/style.css" type="text/css" charset="utf-8" />
 </head>
 
 <body>
-  <a href="http://github.com/elektronaut/dynamic_image"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+	<a href="http://github.com/elektronaut/dynamic_image"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
   
   <div id="container">
 
@@ -45,28 +20,87 @@
         <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
     </div>
       
-    <h1><a href="http://github.com/elektronaut/dynamic_image">DynamicImage</a> 
+    <h1><a href="http://github.com/elektronaut/dynamic_image">DynamicImage Engine</a> 
       <span class="small">by <a href="http://github.com/elektronaut">elektronaut</a></small></h1>
 
     <div class="description">
-      Rails engine providing transparent uploading, resizing and processing on the fly, and caching of image files.
+		DynamicImage is a rails engine providing transparent uploading, resizing and processing on the fly, and caching of image files.
     </div>
 
-    <h2>Authors</h2>
-<p>Inge Jørgensen (inge@manualdesign.no)<br/><br/>      </p>
+	<h2>Requirements</h2>
+	<ul>
+		<li><a href="http://www.rubyonrails.org/">Ruby on Rails</a> 1.2.x+</li>
+		<li><a href="http://www.rails-engines.org/">Engines</a></li>
+		<li><a href="http://rubyforge.org/projects/rmagick/">RMagick</a></li>
+	</ul>
+	<p>
+		DynamicImage is targetting both Rails 1.2.x and 2.x, and should be compatible with both. Earlier versions might work, but haven’t been tested.
+	</p>
+
+	<h2>Note</h2>
+	<p>DynamicImage uses two tables, images and binaries. Please make sure these don’t clash with your current database schema. If they do, you need to do your own migrations.</p>
+
+	<h2>Installation</h2>
+	<p>You can install the plugin from github:</p>
+	<pre>script/plugin install git://github.com/elektronaut/dynamic_image.git</pre>
+	<p>Once the plugin is installed, you need to create the database tables:</p>
+<pre>script/generate plugin_migration dynamic_image
+rake db:migrate</pre>
+	<p>The routes also need to be hooked up, add the following line somewhere in your config/routes.rb file:</p>
+	<pre>map.from_plugin :dynamic_image</pre>
+
+	<h2>Usage</h2>
+	<p><strong>Uploading an image</strong></p>
+	<p>Creating a new image from an uploaded file is simple, here’s some example view code:</p>
+
+<pre>&lt;% form_for &#x27;image&#x27;, Image.new, :html =&gt; {:multipart =&gt; true} do |f| %&gt;
+  Name: &lt;%= f.text_field :name %&gt;
+  File: &lt;%= f.file_field :imagefile %&gt;
+  &lt;%= submit_tag &quot;Upload&quot; %&gt;
+ &lt;% end %&gt;</pre>
+
+	<p>And for the controller:</p>
+	<pre>@image = Image.create(params[:image])</pre>
+
+	<p><strong>Displaying an image</strong></p>
+	<p>Use the dynamic_image_tag helper in your views to display an image, for example:</p>
+	<pre>&lt;%= dynamic_image_tag @user.avatar, :size => '64x64' %&gt;</pre>
+	<pre>&lt;%= dynamic_image_tag @user.avatar, :size => '150x', :filterset => 'dropshadow' %&gt;</pre>
+	<p>See <em>ApplicationHelper.dynamic_image_tag</em> for more info.</p>
+
+	<p><strong>Associations</strong></p>
+	<p>Using the <em>belongs_to_image</em> macro enables you to set an image directly from an uploaded file. Example:</p>
+
+<pre>class User
+  belongs_to_image :avatar
+end</pre>
+	<p>Refer to <em>ActiveRecord::Associations::ClassMethods</em> for documentation.</p>
+
+	<p><strong>Filtersets</strong></p>
+	<p>Filtersets provide an easy way to process your thumbnails through ImageMagick. You can create multiple filtersets, and use them in a <em>dynamic_image_tag</em> with the <em>:filterset</em> option. They are documented in <em>DynamicImage::Filterset</em>.</p>
+
+	<p><strong>Caching</strong></p>
+	<p>Processing images on the fly is expensive. Therefore, page caching is enabled by default, even in development mode. To disable page caching, add the following line in your initializers or <em>environment.rb</em>:</p>
+	<pre>DynamicImage.page_caching = false</pre>
 
 
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/elektronaut/dynamic_image/zipball/master">zip</a> or
-      <a href="http://github.com/elektronaut/dynamic_image/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/elektronaut/dynamic_image</pre>
-    </p>
-      
+		    <h2>Download</h2>
+		    <p>
+		      You can download this project in either
+		      <a href="http://github.com/elektronaut/dynamic_image/zipball/master">zip</a> or
+		      <a href="http://github.com/elektronaut/dynamic_image/tarball/master">tar</a> formats.
+		    </p>
+		    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
+		      by running:
+		      <pre>$ git clone git://github.com/elektronaut/dynamic_image</pre>
+		    </p>
+
+	    <h2>Authors</h2>
+	<p>Inge Jørgensen (inge@manualdesign.no)
+	<br/>
+	<br/>      </p>
+
+
     <div class="footer">
       get the source code on GitHub : <a href="http://github.com/elektronaut/dynamic_image">elektronaut/dynamic_image</a>
     </div>
