@@ -1,3 +1,8 @@
+= Note:
+
+This plugin used to be called dynamic_image, but has been superseded by a new plugin without the Engines dependency. The new plugin is here:
+http://github.com/elektronaut/dynamic_image
+
 = DynamicImage
 
 DynamicImage is a rails engine providing transparent uploading, resizing 
@@ -14,7 +19,7 @@ DynamicImage is targetting both Rails 1.2.x and 2.x, and should be
 compatible with both. Earlier versions might work, but haven't been tested.
 
 
-== Note:
+== Database notice:
 
 DynamicImage uses two tables, <tt>images</tt> and <tt>binaries</tt>. 
 Please make sure these don't clash with your current database schema.
@@ -25,7 +30,7 @@ If they do, you need to do your own migrations.
 
 You can install the plugin from github:
 
-  script/plugin install git://github.com/elektronaut/dynamic_image.git
+  script/plugin install git://github.com/elektronaut/dynamic_image_engine.git
 
 Once the plugin is installed, you need to create the database tables:
 
